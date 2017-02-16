@@ -11,32 +11,52 @@ namespace ChatRoomServer
 {
     public class Server
     {
-        TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8000);
-        TcpClient client = new TcpClient("127.0.0.1", 8000);
-        
+
+        TcpListener listener;
+        TcpClient client;
+        string message = string.Empty;
+        StreamReader reader;
+        StreamWriter writer;
 
         public void StartServer()
         {
+            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 1024);
             listener.Start();
+            Console.WriteLine("The server has been started.");
         }
 
         public void Listen()
         {
-            client = listener.AcceptTcpClient();           
+            Console.WriteLine("Waiting for incoming client connections...");
+            client = listener.AcceptTcpClient();
+            Console.WriteLine("New client connection established...");
         }
 
         public void ProcessMessage()
         {
-            StreamReader reader = new StreamReader(client.GetStream());
-            StreamWriter writer = new StreamWriter(client.GetStream());
+            reader = new StreamReader(client.GetStream());
+            message = reader.ReadLine();
+            Console.WriteLine("From client -> " + message);
+            Console.WriteLine("From server -> " + message);
+            writer = new StreamWriter(client.GetStream());
+            this.message = this.reader.ReadLine();
+            string clientString = this.reader.ReadLine();
+            writer.WriteLine(clientString);
+            writer.Flush();
         }
 
         public void End()
         {
             listener.Stop();
-        }
+        }        
     }
 }
+
+
+
+
+
+
 
 //IPEndPoint endpoint = new IPEndPoint(IPAddress.Any, 8080);
 //Socket newSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

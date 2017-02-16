@@ -12,24 +12,33 @@ namespace ChatRoomClient
     public class Client
 
     {
-        string message;
+        string message = string.Empty;
+        TcpClient client;
+        StreamReader reader;
+        StreamWriter writer;
+
         public Client()
         {
-            TcpClient client = new TcpClient("127.0.0.1", 8000);
-            StreamReader reader = new StreamReader(client.GetStream());
-			StreamWriter writer = new StreamWriter(client.GetStream());
+            client = new TcpClient("127.0.0.1", 1024);
+            reader = new StreamReader(client.GetStream());
+		    writer = new StreamWriter(client.GetStream());
         }
-        public void CloseMessage()
+        public void EndMessage()
         {
-           // Close();
-
+           client.Close();
         }
 
-        public string DisplayMessage()
+        public void SendMessage()
         {
             Console.WriteLine("Enter a message to the server");
             message = Console.ReadLine();
-            return message;
+            writer.WriteLine(message);
+            writer.Flush();
+
+            reader = new StreamReader(client.GetStream());
+            message = reader.ReadLine(); 
+            string serverString = reader.ReadLine();
+            Console.WriteLine(serverString);
         }
     }
 }
