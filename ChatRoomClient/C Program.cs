@@ -17,6 +17,8 @@ namespace ChatRoomClient
             Client client = new Client();
             client.SendMessage();
             Console.ReadLine();
+            client.ReadMessage();
+            Console.ReadLine();
             client.EndMessage();
         }        
     }

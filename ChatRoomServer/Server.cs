@@ -14,9 +14,7 @@ namespace ChatRoomServer
 
         TcpListener listener;
         TcpClient client;
-        string message = string.Empty;
-        StreamReader reader;
-        StreamWriter writer;
+        NetworkStream networkStream;
 
         public void StartServer()
         {
@@ -34,22 +32,41 @@ namespace ChatRoomServer
 
         public void ProcessMessage()
         {
-            reader = new StreamReader(client.GetStream());
-            message = reader.ReadLine();
-            Console.WriteLine("From client -> " + message);
-            Console.WriteLine("From server -> " + message);
-            writer = new StreamWriter(client.GetStream());
-            this.message = this.reader.ReadLine();
-            string clientString = this.reader.ReadLine();
-            writer.WriteLine(clientString);
-            writer.Flush();
+            byte[] incommingBytes = new byte[256];
+            string dataFromClient = null;
+
+            networkStream = client.GetStream();
+            networkStream.Read(incommingBytes, 0, (int)client.ReceiveBufferSize);
+            dataFromClient = Encoding.ASCII.GetString(incommingBytes);
+            ReturnMessage(dataFromClient);
+
+            //dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
+
+
+        }
+
+        public static void ReturnMessage(string msg)
+        {
+            Byte[] broadcastBytes = null;
+            broadcastBytes = Encoding.ASCII.GetBytes(msg);
         }
 
         public void End()
         {
             listener.Stop();
-        }        
+        }
+
+        //reader = new StreamReader(client.GetStream());
+        //    message = reader.ReadLine();
+        //    Console.WriteLine("From client -> " + message);
+        //    Console.WriteLine("From server -> " + message);
+        //    writer = new StreamWriter(client.GetStream());
+        //    this.message = this.reader.ReadLine();
+        //    string clientString = this.reader.ReadLine();
+        //writer.WriteLine(clientString);
+        //    writer.Flush();        
     }
+
 }
 
 
