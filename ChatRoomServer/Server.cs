@@ -14,59 +14,51 @@ namespace ChatRoomServer
 
         TcpListener listener;
         TcpClient client;
-        NetworkStream networkStream;
+
+        public void RunServer()
+        {
+            StartServer();
+            Listen();
+            ProcessMessage();
+            End();
+        }
 
         public void StartServer()
         {
-            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 1024);
+            listener = new TcpListener(IPAddress.Any, 45000);
             listener.Start();
             Console.WriteLine("The server has been started.");
         }
 
         public void Listen()
         {
-            Console.WriteLine("Waiting for incoming client connections...");
-            client = listener.AcceptTcpClient();
-            Console.WriteLine("New client connection established...");
+            while(true)
+            {
+                Console.WriteLine("Waiting for incoming client connections...");
+                client = listener.AcceptTcpClient();
+                Console.WriteLine("New client connection established...");
+            }
+
         }
 
         public void ProcessMessage()
         {
-            byte[] incommingBytes = new byte[256];
-            string dataFromClient = null;
+            byte[] bytesFrom = new byte[256];
+            NetworkStream networkStream = client.GetStream();
+            networkStream.Read(bytesFrom, 0, bytesFrom.Length);
+            string clientData = Encoding.ASCII.GetString(bytesFrom);
 
-            networkStream = client.GetStream();
-            networkStream.Read(incommingBytes, 0, (int)client.ReceiveBufferSize);
-            dataFromClient = Encoding.ASCII.GetString(incommingBytes);
-            ReturnMessage(dataFromClient);
-
-            //dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
-
-
+            byte[] data = null;
+            data = Encoding.ASCII.GetBytes(clientData);
+            networkStream.Write(data, 0, data.Length);
+            networkStream.Flush();
         }
-
-        public static void ReturnMessage(string msg)
-        {
-            Byte[] broadcastBytes = null;
-            broadcastBytes = Encoding.ASCII.GetBytes(msg);
-        }
-
+        
         public void End()
         {
             listener.Stop();
         }
-
-        //reader = new StreamReader(client.GetStream());
-        //    message = reader.ReadLine();
-        //    Console.WriteLine("From client -> " + message);
-        //    Console.WriteLine("From server -> " + message);
-        //    writer = new StreamWriter(client.GetStream());
-        //    this.message = this.reader.ReadLine();
-        //    string clientString = this.reader.ReadLine();
-        //writer.WriteLine(clientString);
-        //    writer.Flush();        
-    }
-
+    }        
 }
 
 

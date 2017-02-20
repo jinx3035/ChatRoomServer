@@ -9,72 +9,68 @@ using System.IO;
 
 namespace ChatRoomClient
 {
-    public class Client
+    public class Client : IRunChatRoom
 
     {
         TcpClient client;
         NetworkStream writer;
         NetworkStream reader;
 
-        public Client()
+        void IRunChatRoom.StartClient()
         {
-            client = new TcpClient("127.0.0.1", 1024);
+            client = new TcpClient("192.168.0.127", 45000);
             reader = client.GetStream();
-		    writer = client.GetStream();
+            writer = client.GetStream();
         }
 
-        public void SendMessage()
+        void IRunChatRoom.SendMessage()
         {
             if (!(writer.CanWrite)) { throw new Exception(); }
             else
             {
-                try
+                while(true)
                 {
-                    byte[] data = Encoding.ASCII.GetBytes("Enter a message to the server");
-                    writer.Write(data, 0, data.Length);
-                }
-                catch { Console.WriteLine("There was a problem sending your message."); }
+                    try
+                    {
+                        Console.WriteLine("Enter a message to the server");
+                        string message = Console.ReadLine();
+                        byte[] data = Encoding.ASCII.GetBytes(message);
+                        writer.Write(data, 0, data.Length);
+                    }
+                    catch { Console.WriteLine("There was a problem sending your message."); }
+                }                              
             }
         }
 
-        public void ReadMessage()
+        void IRunChatRoom.ReadMessage()
         {
             if (!(reader.CanRead)) { throw new Exception(); }
             else
             {
-                try
+                while (true)
                 {
-                    byte[] data = new byte[256];
-                    StringBuilder completeMessage = new StringBuilder();
-                    int bytesRead = 0;
-                    do
+                    try
                     {
-                        bytesRead = reader.Read(data, 0, data.Length);
-                        completeMessage.AppendFormat("{0}", Encoding.ASCII.GetString(data, 0, bytesRead));
+                        byte[] data = new byte[256];
+                        StringBuilder completeMessage = new StringBuilder();
+                        int bytesRead = 0;
+                        do
+                        {
+                            bytesRead = reader.Read(data, 0, data.Length);
+                            completeMessage.AppendFormat("{0}", Encoding.ASCII.GetString(data, 0, bytesRead));
+                        }
+                        while (reader.DataAvailable);
+                        Console.WriteLine("You've got mail: \n\n" + completeMessage);
+
                     }
-                    while (reader.DataAvailable);
-                    Console.WriteLine("You've got mail: " + completeMessage);
-                }
-                catch { Console.WriteLine("There was a problem sending your message."); }
-            }
+                    catch { Console.WriteLine("There was a problem receiving your message."); }
+                }               
+            }                            
         }
 
-
-
-        public void EndMessage()
+        void IRunChatRoom.EndMessage()
         {
             client.Close();
         }
     }
 }
-
-
-
-//Console.WriteLine("Enter a message to the server");
-//message = Console.ReadLine();
-//writer.WriteLine(message);
-//writer.Flush();
-//reader = new StreamReader(client.GetStream());
-//message = reader.ReadLine(); 
-//string serverString = reader.ReadLine();
-//Console.WriteLine(serverString);

@@ -14,12 +14,12 @@ namespace ChatRoomClient
     {
         static void Main(string[] args)
         {
-            Client client = new Client();
-            client.SendMessage();
-            Console.ReadLine();
-            client.ReadMessage();
-            Console.ReadLine();
-            client.EndMessage();
+
+            IRunChatRoom room = new Client();
+            room.StartClient();
+            room.SendMessage();
+            room.ReadMessage();
+            room.EndMessage();
         }        
     }
 }

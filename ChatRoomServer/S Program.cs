@@ -15,12 +15,7 @@ namespace ChatRoomServer
         static void Main(string[] args)
         {
             Server server = new Server();
-            server.StartServer();
-            server.Listen();
-            server.ProcessMessage();
-            Console.ReadLine();
-            server.End();
-
+            server.RunServer();
         }
     }
 }
