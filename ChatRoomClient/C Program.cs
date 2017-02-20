@@ -14,12 +14,8 @@ namespace ChatRoomClient
     {
         static void Main(string[] args)
         {
-
-            IRunChatRoom room = new Client();
-            room.StartClient();
-            room.SendMessage();
-            room.ReadMessage();
-            room.EndMessage();
+            IRunChatRoom chatRoom = new Client();
+            chatRoom.StartClient();
         }        
     }
 }

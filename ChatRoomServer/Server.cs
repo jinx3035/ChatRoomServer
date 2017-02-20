@@ -14,44 +14,55 @@ namespace ChatRoomServer
 
         TcpListener listener;
         TcpClient client;
+        string clientData;
+        NetworkStream stream;
+
 
         public void RunServer()
         {
-            StartServer();
-            Listen();
-            ProcessMessage();
+            StartServerListen();
+            ReadMessage();
+            ReturnMessage();
             End();
         }
 
-        public void StartServer()
+        public void StartServerListen()
         {
-            listener = new TcpListener(IPAddress.Any, 45000);
-            listener.Start();
-            Console.WriteLine("The server has been started.");
-        }
-
-        public void Listen()
-        {
-            while(true)
-            {
+            //bool isRunning = true;
+            //while (isRunning)
+            //{
+                listener = new TcpListener(IPAddress.Any, 9555);
+                listener.Start();
+                Console.WriteLine("The server has been started. \n");
+        
                 Console.WriteLine("Waiting for incoming client connections...");
                 client = listener.AcceptTcpClient();
                 Console.WriteLine("New client connection established...");
-            }
+           // }
 
         }
 
-        public void ProcessMessage()
+        public void ReadMessage()
         {
-            byte[] bytesFrom = new byte[256];
-            NetworkStream networkStream = client.GetStream();
-            networkStream.Read(bytesFrom, 0, bytesFrom.Length);
-            string clientData = Encoding.ASCII.GetString(bytesFrom);
-
-            byte[] data = null;
-            data = Encoding.ASCII.GetBytes(clientData);
-            networkStream.Write(data, 0, data.Length);
-            networkStream.Flush();
+            stream = client.GetStream();
+            while (stream.CanRead)
+            {
+                byte[] bytesFrom = new byte[256];
+                stream.Read(bytesFrom, 0, bytesFrom.Length);
+                clientData = Encoding.ASCII.GetString(bytesFrom);
+            }
+                
+        }
+        public void ReturnMessage()
+        {
+            do
+            {
+                byte[] data = null;
+                data = Encoding.ASCII.GetBytes(clientData);
+                stream.Write(data, 0, data.Length);
+                stream.Flush();
+            }
+            while (stream.CanWrite);
         }
         
         public void End()

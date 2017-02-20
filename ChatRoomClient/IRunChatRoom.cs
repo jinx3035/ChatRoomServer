@@ -9,8 +9,8 @@ namespace ChatRoomClient
     public interface IRunChatRoom
     {
         void StartClient();
-        void SendMessage();
-        void ReadMessage();
-        void EndMessage();
+        //void SendMessage();
+        //void ReadMessage();
+        //void EndMessage();
     }
 }
